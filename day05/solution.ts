@@ -4,10 +4,29 @@ const parts: Array<Array<string>> = await file.text()
   .then(text => text.trim().split("\n\n"))
   .then(parts => parts.map(part => part.split("\n")))
 
-const seeds: Array<number> = parts[0][0]
+let seeds: Array<number> = parts[0][0]
   .split(": ")[1]
   .split(" ")
   .map(Number)
+
+let size = 0
+for (let i = 1; i < seeds.length; i += 2) {
+  size += seeds[i]
+}
+
+let newSeeds: Array<number> = new Array(size)
+
+let index = 0
+for (let i = 0; i < seeds.length; i += 2) {
+  const start = seeds[i]
+  const range = seeds[i+1]
+
+  for (let j = start; j < start + range; j++) {
+    newSeeds[index++] = j
+  }
+}
+
+seeds = newSeeds
 
 type Step = Array<[number, number, number]>
 
@@ -22,9 +41,6 @@ const steps: Array<Step> = parts
             line.split(" ").map(Number)
         ) as Step
   )
-
-console.log("seeds", seeds)
-console.log("steps", steps)
 
 const locations = seeds
   .map(
@@ -50,6 +66,12 @@ function inRange(number: number, src: number, range: number): boolean {
   return number >= src && number < src + range
 }
 
-console.log("locations", locations)
+console.log("result", minFromArray(locations))
 
-console.log("result", Math.min(...locations))
+function minFromArray(arr: Array<number>): number {
+  let min = arr[0]
+  for(let i = 1; i < arr.length; i++) {
+    min = arr[i] > min ? min : arr[i]
+  }
+  return min
+}
